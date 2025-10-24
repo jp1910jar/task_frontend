@@ -1,0 +1,134 @@
+/* === General Container === */
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background: #f0f4f8;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* === Stats Cards Grid === */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* === Card Base Style === */
+.card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+}
+
+/* === Card Header & Content === */
+.card-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.card-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* === Stats Values === */
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.stat-description {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* === Chart Container Overrides === */
+.recharts-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* === Progress Section for Reference (optional) === */
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 500;
+}
+
+/* === Pie Chart Labels === */
+.recharts-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* === Bar Chart Overrides === */
+.recharts-cartesian-axis-tick-value {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* === Tooltip Customization === */
+.recharts-tooltip-wrapper {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+/* === Legend === */
+.recharts-legend-item-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* === Responsive Adjustments === */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-content {
+    gap: 8px;
+  }
+}

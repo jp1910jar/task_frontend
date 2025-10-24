@@ -1,0 +1,33 @@
+.task-page {
+  padding: 20px;
+  color: #fff;
+}
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.task-form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 20px 0;
+}
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e1e2f;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.task-table th, .task-table td {
+  border: 1px solid #333;
+  padding: 8px;
+  text-align: left;
+}
+.task-table th {
+  background: #29293f;
+}
+.task-table tr:hover {
+  background: #2f2f44;
+}

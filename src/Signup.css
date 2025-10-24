@@ -1,0 +1,144 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Container with animated background */
+.signup-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #f0f2f5, #e0ebff);
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  overflow: hidden; /* keeps bg shapes inside */
+}
+
+/* Background shapes */
+.bg-shape {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.25;
+  filter: blur(40px);
+}
+
+.shape1 {
+  width: 300px;
+  height: 300px;
+  background: #007bff;
+  top: -50px;
+  left: -50px;
+}
+
+.shape2 {
+  width: 350px;
+  height: 350px;
+  background: #00c3ff;
+  bottom: -80px;
+  right: -60px;
+}
+
+/* Form styling */
+.signup-form {
+  position: relative;
+  background-color: #ffffff;
+  padding: 30px 40px;
+  border-radius: 16px;
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  z-index: 2; /* keeps it above background shapes */
+}
+
+/* Logo */
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.logo-simple {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Heading */
+.signup-form h2 {
+  margin-bottom: 20px;
+  color: #333333;
+  font-size: 22px;
+}
+
+/* Input fields */
+.signup-form input,
+.signup-form select {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 10px 0;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.signup-form input:focus,
+.signup-form select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Button */
+.signup-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.signup-form button:hover {
+  background-color: #0056b3;
+}
+
+/* Login link */
+.login-link {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #555555;
+}
+
+.login-link a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* ✅ Responsive */
+@media (max-width: 480px) {
+  .signup-form {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .signup-form h2 {
+    font-size: 20px;
+  }
+
+  .logo-simple {
+    height: 60px;
+  }
+}

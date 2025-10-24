@@ -1,0 +1,68 @@
+/* Layout.css */
+*{
+  margin: 0%;
+  padding: 0%;
+}
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f3f4f6; /* light gray background */
+}
+
+/* Sidebar fixed width */
+.sidebar {
+  width: 250px; /* adjust as needed */
+  min-width: 250px;
+  height: 100vh;
+  position: fixed; /* keep sidebar fixed */
+  top: 0;
+  left: 0;
+  background-color: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  overflow-y: auto; /* scroll sidebar if content overflows */
+  transition: width 0.3s;
+  z-index: 1000;
+}
+
+/* Collapsed sidebar */
+.sidebar.collapsed {
+  width: 80px;
+  min-width: 80px;
+}
+
+/* Main content next to sidebar */
+.main-content {
+  margin-left: 250px; /* same as sidebar width */
+  flex: 1;
+  padding: 20px;
+  transition: margin-left 0.3s;
+}
+
+.main-content.collapsed {
+  margin-left: 80px; /* collapsed sidebar width */
+}
+
+/* Optional: scrollbar style for sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
+  transition: margin-left 0.3s ease;
+  padding: 20px;
+}
+
+.main-content.collapsed {
+  margin-left: 80px; /* width of collapsed sidebar */
+}
+
