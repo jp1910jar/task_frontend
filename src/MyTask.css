@@ -170,3 +170,10 @@
 
 .edit-btn:hover { background: #ffc10755; }
 .delete-btn:hover { background: #dc354555; }
+.task-table, 
+.task-table th, 
+.task-table td, 
+.task-table tr {
+  background-color: #fff !important;
+  color: #333 !important;
+}
