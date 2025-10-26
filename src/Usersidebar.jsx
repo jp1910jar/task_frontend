@@ -18,7 +18,7 @@ const Usersidebar = ({ isCollapsed, setIsCollapsed }) => {
   const navItems = [
     { title: "Dashboard", href: "/user/userdashboard", icon: <LayoutIcon /> },
     { title: "My Tasks", href: "/user/mytask", icon: <List /> },
-    { title: "Workspaces", href: "/user/userworkspace", icon: <Grid /> }, // ✅ added
+    { title: "Workgroup", href: "/user/userworksp", icon: <Grid /> }, // ✅ added
   ];
 
   const handleLogout = () => {

@@ -18,7 +18,7 @@ const SidebarComponent = ({ isCollapsed, setIsCollapsed }) => {
 
   const navItems = [
     { title: "Dashboard", href: "/dashboard", icon: <Layout /> },
-    { title: "Workspaces", href: "/workspace", icon: <Users /> },
+    { title: "Workgroup", href: "/workgroup", icon: <Users /> },
     { title: "My Tasks", href: "/mytask", icon: <List /> },
     { title: "Members", href: "/member", icon: <Users /> },
   

@@ -1,28 +1,23 @@
-// src/App.js
+// src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-// Auth pages
+// 🔐 Auth pages
 import Signup from "./Signup";
 import Login from "./Login";
 
-// Admin pages
+// 🧩 Admin pages
 import Dashboard from "./Dashboard";
-
-import ProjectTask from "./ProjectTask"; // ✅ new
+import ProjectTask from "./ProjectTask";
 import MyTask from "./MyTask";
 import Setting from "./Setting";
 import Member from "./Member";
 import Achieved from "./Achieved";
+import Workgroup from "./Workgroup"; // ✅ Workspace renamed as Workgroup
 
-
-
-// Layouts
+// 🧱 Layouts
 import Layout from "./Layout";          // Admin layout
 import Userlayout from "./Userlayout";  // User layout
-
-// User pages
-
 
 function App() {
   return (
@@ -42,8 +37,17 @@ function App() {
           }
         />
 
-       
-        {/* ✅ Project Task level */}
+        {/* ✅ Workgroup route for Admin */}
+        <Route
+          path="/workgroup"
+          element={
+            <Layout>
+              <Workgroup />
+            </Layout>
+          }
+        />
+
+        {/* ✅ Project Task route */}
         <Route
           path="/projecttask/:workspaceId"
           element={
@@ -104,12 +108,21 @@ function App() {
             </Userlayout>
           }
         />
-       
         <Route
           path="/user/projecttask/:workspaceId"
           element={
             <Userlayout>
               <ProjectTask />
+            </Userlayout>
+          }
+        />
+
+        {/* ✅ Workgroup route for User */}
+        <Route
+          path="/user/workgroup"
+          element={
+            <Userlayout>
+              <Workgroup />
             </Userlayout>
           }
         />

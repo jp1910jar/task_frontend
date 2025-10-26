@@ -27,15 +27,15 @@ const MyTask = () => {
   const fetchTasks = async () => {
     try {
       const response = await getTasks();
-      setTasks(response.data);
+      setTasks(response.data || []);
     } catch (error) {
-      console.error(error);
+      console.error("Fetch Error:", error);
       alert(error.response?.data?.message || "Failed to fetch tasks");
     }
   };
 
-  const filteredTasks = statusFilter === "All" 
-    ? tasks 
+  const filteredTasks = statusFilter === "All"
+    ? tasks
     : tasks.filter(task => task.status === statusFilter);
 
   const handleChange = (e) => {
@@ -56,7 +56,7 @@ const MyTask = () => {
     e.preventDefault();
     const taskToSend = normalizeTask(newTask);
 
-    if (!taskToSend.assignedTo || !taskToSend.name) {
+    if (!taskToSend.name.trim() || !taskToSend.assignedTo.trim()) {
       alert("Task Name and Assigned To are required");
       return;
     }
@@ -69,14 +69,24 @@ const MyTask = () => {
         setEditingTask(null);
       } else {
         response = await createTask(taskToSend);
-        setTasks([...tasks, response.data]);
+        if (response && response.data) {
+          setTasks([...tasks, response.data]);
+        } else {
+          alert("Task created but server returned no data");
+        }
       }
 
       setNewTask({ name: "", priority: "Medium", status: "Not Started", assignedTo: "", startDate: "", endDate: "", estimate: "" });
       setShowPopup(false);
     } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || "Failed to save task");
+      console.error("Save Error:", error);
+      if (error.response) {
+        alert(error.response.data?.message || "Failed to save task");
+      } else if (error.request) {
+        alert("Network Error: Could not reach backend");
+      } else {
+        alert("Error: " + error.message);
+      }
     }
   };
 
@@ -85,7 +95,7 @@ const MyTask = () => {
       await deleteTask(id);
       setTasks(tasks.filter(t => t._id !== id));
     } catch (error) {
-      console.error(error);
+      console.error("Delete Error:", error);
       alert(error.response?.data?.message || "Failed to delete task");
     }
   };
@@ -116,7 +126,7 @@ const MyTask = () => {
             <th>Task Name</th>
             <th>Priority</th>
             <th>Status</th>
-            <th>Created By</th>
+            <th>Assigned To</th>
             <th>Start Date</th>
             <th>End Date</th>
             <th>Estimate</th>
@@ -130,8 +140,8 @@ const MyTask = () => {
               <td><span className={`priority ${task.priority.toLowerCase()}`}>{task.priority}</span></td>
               <td><span className={`status ${task.status.replace(" ","-")}`}>{task.status}</span></td>
               <td>{task.assignedTo}</td>
-              <td>{task.startDate}</td>
-              <td>{task.endDate}</td>
+              <td>{task.startDate ? new Date(task.startDate).toLocaleDateString() : "-"}</td>
+              <td>{task.endDate ? new Date(task.endDate).toLocaleDateString() : "-"}</td>
               <td>{task.estimate}</td>
               <td className="actions">
                 <button className="edit-btn" onClick={() => handleEdit(task)}>✏️ Edit</button>
@@ -160,7 +170,7 @@ const MyTask = () => {
               <input type="text" name="estimate" placeholder="Estimate Time" value={newTask.estimate} onChange={handleChange} />
               <div className="popup-actions">
                 <button type="submit" className="save-btn">{editingTask ? "Update" : "Save"}</button>
-                <button type="button" className="cancel-btn" onClick={() => { setShowPopup(false); setEditingTask(null); }}>Cancel</button>
+                <button type="button" className="cancel-btn" onClick={() => { setShowPopup(false); setEditingTask(null); setNewTask({ name:"",priority:"Medium",status:"Not Started",assignedTo:"",startDate:"",endDate:"",estimate:"" }); }}>Cancel</button>
               </div>
             </form>
           </div>
