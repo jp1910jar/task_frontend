@@ -210,3 +210,7 @@
 .form-actions button[type="button"] {
   background: #ccc;
 }
+.registered-user {
+  background-color: #f0f8ff;
+  border-left: 4px solid #007bff;
+}

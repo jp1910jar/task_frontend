@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { getWorkgroupById, createWorkspace } from "./api"; // centralized API functions
 import "./Workgroup.css";
 
 const WorkspacePage = () => {
   const { id } = useParams(); // workgroup ID
+  const navigate = useNavigate(); // ✅ for navigation
   const [workgroup, setWorkgroup] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
   const [members, setMembers] = useState([]);
@@ -36,6 +37,10 @@ const WorkspacePage = () => {
     }
   };
 
+  const handleWorkspaceClick = (workspaceId) => {
+    navigate(`/projecttask/${workspaceId}`); // ✅ redirect to ProjectTask page
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -52,6 +57,8 @@ const WorkspacePage = () => {
               key={ws._id}
               className="workspace-card"
               whileHover={{ scale: 1.02 }}
+              onClick={() => handleWorkspaceClick(ws._id)} // ✅ added click event
+              style={{ cursor: "pointer" }} // ✅ pointer cursor
             >
               <h4>{ws.name}</h4>
               <p>{ws.description}</p>
