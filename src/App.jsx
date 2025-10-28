@@ -13,7 +13,8 @@ import MyTask from "./MyTask";
 import Setting from "./Setting";
 import Member from "./Member";
 import Achieved from "./Achieved";
-import Workgroup from "./Workgroup"; // ✅ Workspace renamed as Workgroup
+import Workgroup from "./Workgroup"; // ✅ Workgroup page
+import Workspace from "./Workspace"; // ✅ Newly added import
 
 // 🧱 Layouts
 import Layout from "./Layout";          // Admin layout
@@ -23,11 +24,11 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* 🌐 Public pages */}
+        {/* 🌐 Public routes */}
         <Route path="/" element={<Signup />} />
         <Route path="/login" element={<Login />} />
 
-        {/* 🧩 Admin panel routes */}
+        {/* 🧩 Admin Panel Routes */}
         <Route
           path="/dashboard"
           element={
@@ -36,8 +37,6 @@ function App() {
             </Layout>
           }
         />
-
-        {/* ✅ Workgroup route for Admin */}
         <Route
           path="/workgroup"
           element={
@@ -46,8 +45,16 @@ function App() {
             </Layout>
           }
         />
+        {/* ✅ New Route for Workgroup → Workspaces */}
+        <Route
+          path="/workgroup/:id/workspaces"
+          element={
+            <Layout>
+              <Workspace />
+            </Layout>
+          }
+        />
 
-        {/* ✅ Project Task route */}
         <Route
           path="/projecttask/:workspaceId"
           element={
@@ -56,8 +63,6 @@ function App() {
             </Layout>
           }
         />
-
-        {/* 📋 Other admin routes */}
         <Route
           path="/mytask"
           element={
@@ -91,7 +96,7 @@ function App() {
           }
         />
 
-        {/* 👤 User panel routes */}
+        {/* 👤 User Panel Routes */}
         <Route
           path="/user/userdashboard"
           element={
@@ -116,8 +121,6 @@ function App() {
             </Userlayout>
           }
         />
-
-        {/* ✅ Workgroup route for User */}
         <Route
           path="/user/workgroup"
           element={
