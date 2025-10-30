@@ -40,3 +40,13 @@ export const getWorkgroupById = (id) => API.get(`/workgroups/${id}`);
 // Create workspace inside a workgroup
 export const createWorkspace = (id, data) =>
   API.post(`/workgroups/${id}/workspaces`, data);
+// ---- Project Task APIs ----
+export const getProjectTasks = (workspaceId, status) =>
+  API.get(`/project-tasks/${workspaceId}`, { params: { status } });
+
+export const createProjectTask = (taskData) => API.post("/project-tasks", taskData);
+
+export const updateProjectTask = (id, updatedData) =>
+  API.put(`/project-tasks/${id}`, updatedData);
+
+export const deleteProjectTask = (id) => API.delete(`/project-tasks/${id}`);

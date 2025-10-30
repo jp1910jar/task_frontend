@@ -1,33 +1,140 @@
-.task-page {
+.project-task-page {
   padding: 20px;
   color: #fff;
 }
-.task-header {
+
+.project-task-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.task-form {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin: 20px 0;
+
+.header-actions {
+  display: flex;
+  gap: 10px;
 }
-.task-table {
+
+.create-btn {
+  background-color: #4caf50;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.create-btn:hover {
+  background-color: #45a049;
+}
+
+.project-task-table {
   width: 100%;
   border-collapse: collapse;
-  background: #1e1e2f;
-  border-radius: 8px;
+  margin-top: 20px;
+  background: #2a2a3d;
+  border-radius: 10px;
   overflow: hidden;
 }
-.task-table th, .task-table td {
-  border: 1px solid #333;
+
+.project-task-table th, .project-task-table td {
+  padding: 12px;
+  border-bottom: 1px solid #444;
+}
+
+.priority-badge.high { color: #ff5252; font-weight: 600; }
+.priority-badge.medium { color: #ffa500; font-weight: 600; }
+.priority-badge.low { color: #00c853; font-weight: 600; }
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.status-badge.in-progress { background: #3498db; color: white; }
+.status-badge.review { background: #f39c12; color: white; }
+.status-badge.closed { background: #27ae60; color: white; }
+.status-badge.on-hold { background: #9b59b6; color: white; }
+.status-badge.cancelled { background: #e74c3c; color: white; }
+
+.edit-btn, .delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin: 0 4px;
+}
+
+.edit-btn:hover { color: #4caf50; }
+.delete-btn:hover { color: #ff5252; }
+
+.no-task {
+  text-align: center;
+  padding: 20px;
+  color: #aaa;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(20, 20, 30, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.modal-card {
+  background: #2e2e42;
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  color: white;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+}
+
+.modal-card h3 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.modal-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-card input, .modal-card select {
   padding: 8px;
-  text-align: left;
+  border-radius: 6px;
+  border: none;
+  outline: none;
 }
-.task-table th {
-  background: #29293f;
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
 }
-.task-table tr:hover {
-  background: #2f2f44;
+
+.save-btn, .cancel-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.save-btn {
+  background: #4caf50;
+  color: white;
+}
+
+.cancel-btn {
+  background: #e74c3c;
+  color: white;
 }
