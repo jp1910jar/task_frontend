@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { getDashboardStats } from "./api"; // ✅ you already have this
+import { getDashboardStats } from "./api"; 
 import "./Dashboard.css";
 
 const Dashboard = () => {
