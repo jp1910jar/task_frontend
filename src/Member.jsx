@@ -4,11 +4,9 @@ import { getMembers, createMember, updateMember, deleteMember } from "./api";
 
 const Members = () => {
   const [search, setSearch] = useState("");
-  const [tab, setTab] = useState("list");
   const [showPopup, setShowPopup] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [members, setMembers] = useState([]);
-
   const [newMember, setNewMember] = useState({
     name: "",
     email: "",
@@ -17,52 +15,44 @@ const Members = () => {
     role: "member",
   });
 
-  // Fetch members from backend on mount
   useEffect(() => {
     fetchMembers();
   }, []);
 
   const fetchMembers = async () => {
     try {
-      const response = await getMembers();
-      setMembers(response.data || []);
+      const res = await getMembers();
+      const data = Array.isArray(res) ? res : res.data || [];
+      setMembers(data.filter((m) => m && m._id));
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Failed to fetch members");
+      console.error("Error fetching members:", err);
+      setMembers([]);
     }
   };
 
-  const filteredMembers = members.filter((member) =>
-    [member?.name, member?.email, member?.role]
-      .filter(Boolean)
-      .some((field) => field.toLowerCase().includes(search.toLowerCase()))
-  );
-
   const handleAddOrUpdateMember = async (e) => {
     e.preventDefault();
-
     try {
+      let response;
       if (editingMember) {
-        const response = await updateMember(editingMember._id, newMember);
-        setMembers(
-          members.map((m) => (m._id === editingMember._id ? response.data : m))
-        );
-        setEditingMember(null);
+        response = await updateMember(editingMember._id, newMember);
+        const { data, removeOldUser, oldUserId } = response.data;
+
+        let updatedList = members.filter((m) => m._id !== editingMember._id);
+        if (removeOldUser && oldUserId) {
+          updatedList = updatedList.filter((m) => m._id !== oldUserId);
+        }
+        setMembers([data, ...updatedList]);
       } else {
-        const response = await createMember(newMember);
+        response = await createMember(newMember);
         setMembers([response.data, ...members]);
       }
 
-      setNewMember({
-        name: "",
-        email: "",
-        phone: "",
-        designation: "",
-        role: "member",
-      });
+      setNewMember({ name: "", email: "", phone: "", designation: "", role: "member" });
+      setEditingMember(null);
       setShowPopup(false);
     } catch (err) {
-      console.error(err);
+      console.error("Error saving member:", err);
       alert(err.response?.data?.message || "Failed to save member");
     }
   };
@@ -80,19 +70,23 @@ const Members = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this member?")) return;
+    if (!window.confirm("Delete this member?")) return;
     try {
       await deleteMember(id);
       setMembers(members.filter((m) => m._id !== id));
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Failed to delete member");
+      console.error("Delete error:", err);
     }
   };
 
+  const filteredMembers = members.filter((m) =>
+    [m.name, m.email, m.role].some(
+      (v) => v && v.toLowerCase().includes(search.toLowerCase())
+    )
+  );
+
   return (
     <div className="members-container">
-      {/* Header */}
       <div className="members-header">
         <h1>Workspace Members</h1>
         <div className="header-actions">
@@ -104,161 +98,73 @@ const Members = () => {
             className="search-input"
           />
           <button className="add-member-btn" onClick={() => setShowPopup(true)}>
-            + Add New Member
+            + Add Member
           </button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="tabs">
-        <button
-          className={tab === "list" ? "active-tab" : ""}
-          onClick={() => setTab("list")}
-        >
-          List View
-        </button>
-        <button
-          className={tab === "board" ? "active-tab" : ""}
-          onClick={() => setTab("board")}
-        >
-          Board View
-        </button>
+      <div className="list-view">
+        {filteredMembers.map((m) => (
+          <div key={m._id} className="member-card">
+            <div className="avatar">{m.name?.charAt(0).toUpperCase()}</div>
+            <div className="member-details">
+              <p className="member-name">{m.name}</p>
+              <p className="member-email">{m.email}</p>
+              <p className="member-phone">{m.phone}</p>
+              <p className="member-designation">{m.designation}</p>
+              <span className={`role-badge ${m.role === "admin" ? "role-admin" : "role-member"}`}>
+                {m.role}
+              </span>
+            </div>
+            <div className="member-actions">
+              <button className="edit-btn" onClick={() => handleEdit(m)}>✏️</button>
+              <button className="delete-btn" onClick={() => handleDelete(m._id)}>🗑️</button>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* List View */}
-      {tab === "list" && (
-        <div className="list-view">
-          {filteredMembers.map((member) => {
-            const name = member?.name || "Unknown";
-            return (
-              <div key={member._id} className="member-card">
-                <div className="member-info">
-                  <div className="avatar">
-                    {name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <p className="member-name">{name}</p>
-                    <p className="member-email">{member?.email || "N/A"}</p>
-                    <p className="member-phone">{member?.phone || "N/A"}</p>
-                    <p className="member-designation">
-                      {member?.designation || "N/A"}
-                    </p>
-                  </div>
-                </div>
-                <div className="member-role">
-                  <span
-                    className={`role-badge ${
-                      ["admin", "owner"].includes(member?.role)
-                        ? "role-admin"
-                        : "role-member"
-                    }`}
-                  >
-                    {member?.role || "member"}
-                  </span>
-                  <div className="actions">
-                    <button onClick={() => handleEdit(member)}>✏️</button>
-                    <button onClick={() => handleDelete(member._id)}>🗑️</button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Board View */}
-      {tab === "board" && (
-        <div className="board-view">
-          {filteredMembers.map((member) => {
-            const name = member?.name || "Unknown";
-            return (
-              <div key={member._id} className="board-card">
-                <div className="avatar">
-                  {name.substring(0, 2).toUpperCase()}
-                </div>
-                <h3>{name}</h3>
-                <p>{member?.email || "N/A"}</p>
-                <p>{member?.phone || "N/A"}</p>
-                <p>{member?.designation || "N/A"}</p>
-                <span
-                  className={`role-badge ${
-                    ["admin", "owner"].includes(member?.role)
-                      ? "role-admin"
-                      : "role-member"
-                  }`}
-                >
-                  {member?.role || "member"}
-                </span>
-                <div className="actions">
-                  <button onClick={() => handleEdit(member)}>✏️</button>
-                  <button onClick={() => handleDelete(member._id)}>🗑️</button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Popup Form */}
       {showPopup && (
         <div className="popup-overlay" onClick={() => setShowPopup(false)}>
           <div className="popup-form" onClick={(e) => e.stopPropagation()}>
-            <h2>{editingMember ? "Edit Member" : "Add New Member"}</h2>
+            <h2>{editingMember ? "Edit Member" : "Add Member"}</h2>
             <form onSubmit={handleAddOrUpdateMember}>
               <input
                 type="text"
                 placeholder="Name"
-                value={newMember.name || ""}
-                onChange={(e) =>
-                  setNewMember({ ...newMember, name: e.target.value })
-                }
+                value={newMember.name}
+                onChange={(e) => setNewMember({ ...newMember, name: e.target.value })}
                 required
               />
               <input
                 type="email"
                 placeholder="Email"
-                value={newMember.email || ""}
-                onChange={(e) =>
-                  setNewMember({ ...newMember, email: e.target.value })
-                }
+                value={newMember.email}
+                onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
                 required
               />
               <input
                 type="text"
-                placeholder="Phone Number"
-                value={newMember.phone || ""}
-                onChange={(e) =>
-                  setNewMember({ ...newMember, phone: e.target.value })
-                }
+                placeholder="Phone"
+                value={newMember.phone}
+                onChange={(e) => setNewMember({ ...newMember, phone: e.target.value })}
               />
               <input
                 type="text"
                 placeholder="Designation"
-                value={newMember.designation || ""}
-                onChange={(e) =>
-                  setNewMember({ ...newMember, designation: e.target.value })
-                }
+                value={newMember.designation}
+                onChange={(e) => setNewMember({ ...newMember, designation: e.target.value })}
               />
               <select
-                value={newMember.role || "member"}
-                onChange={(e) =>
-                  setNewMember({ ...newMember, role: e.target.value })
-                }
+                value={newMember.role}
+                onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
               >
                 <option value="member">Member</option>
                 <option value="admin">Admin</option>
               </select>
               <div className="form-actions">
-                <button type="submit">
-                  {editingMember ? "Update Member" : "Add Member"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowPopup(false);
-                    setEditingMember(null);
-                  }}
-                >
+                <button type="submit">{editingMember ? "Update" : "Add"}</button>
+                <button type="button" onClick={() => { setShowPopup(false); setEditingMember(null); }}>
                   Cancel
                 </button>
               </div>
