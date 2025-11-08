@@ -6,20 +6,18 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signup from "./Signup";
 import Login from "./Login";
 
-// 🧩 Admin pages
+// 🧩 Admin pages (used for everyone now)
 import Dashboard from "./Dashboard";
 import ProjectTask from "./ProjectTask";
 import MyTask from "./MyTask";
 import Setting from "./Setting";
 import Member from "./Member";
 import Achieved from "./Achieved";
-import Workgroup from "./Workgroup"; // ✅ Workgroup page
-import Workspace from "./Workspace"; // ✅ Newly added import
+import Workgroup from "./Workgroup";
+import Workspace from "./Workspace";
 
-// 🧱 Layouts
-import Layout from "./Layout";          // Admin layout
-import Userlayout from "./Userlayout";  // User layout
-
+// 🧱 Layout
+import Layout from "./Layout"; // ✅ Single layout used for all
 
 function App() {
   return (
@@ -29,7 +27,7 @@ function App() {
         <Route path="/" element={<Signup />} />
         <Route path="/login" element={<Login />} />
 
-        {/* 🧩 Admin Panel Routes */}
+        {/* 🧩 All routes use Layout now */}
         <Route
           path="/dashboard"
           element={
@@ -46,7 +44,6 @@ function App() {
             </Layout>
           }
         />
-        {/* ✅ New Route for Workgroup → Workspaces */}
         <Route
           path="/workgroup/:id/workspaces"
           element={
@@ -55,7 +52,6 @@ function App() {
             </Layout>
           }
         />
-
         <Route
           path="/projecttask/:workspaceId"
           element={
@@ -97,37 +93,37 @@ function App() {
           }
         />
 
-        {/* 👤 User Panel Routes */}
+        {/* 👤 Former user routes — still here but using same layout */}
         <Route
           path="/user/userdashboard"
           element={
-            <Userlayout>
+            <Layout>
               <Dashboard />
-            </Userlayout>
+            </Layout>
           }
         />
         <Route
           path="/user/mytask"
           element={
-            <Userlayout>
+            <Layout>
               <MyTask />
-            </Userlayout>
+            </Layout>
           }
         />
         <Route
           path="/user/projecttask/:workspaceId"
           element={
-            <Userlayout>
+            <Layout>
               <ProjectTask />
-            </Userlayout>
+            </Layout>
           }
         />
         <Route
           path="/user/workgroup"
           element={
-            <Userlayout>
+            <Layout>
               <Workgroup />
-            </Userlayout>
+            </Layout>
           }
         />
       </Routes>
