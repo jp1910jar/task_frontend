@@ -1,4 +1,3 @@
-// src/api.js
 import axios from "axios";
 
 // ✅ Create Axios instance
@@ -24,33 +23,34 @@ export const createMember = (data) => API.post("/members", data);
 export const updateMember = (id, data) => API.put(`/members/${id}`, data);
 export const deleteMember = (id) => API.delete(`/members/${id}`);
 
+// ===== WORKGROUP & WORKSPACE APIS ===== ✅
+// Get all workgroups visible to logged-in user (creator or assigned)
+export const getWorkgroups = () => API.get("/workgroups");
+
+// Create a new workgroup with selected members (User _id array)
+export const createWorkgroup = (data) => API.post("/workgroups", data);
+
+// Get single workgroup by id (only accessible if creator or assigned member)
+export const getWorkgroupById = (id) => API.get(`/workgroups/${id}`);
+
+// Create workspace inside a workgroup with selected members
+export const createWorkspace = (workgroupId, data) =>
+  API.post(`/workgroups/${workgroupId}/workspaces`, data);
+
 // ===== TASK APIS =====
 export const getTasks = () => API.get("/tasks");
 export const createTask = (task) => API.post("/tasks", task);
 export const updateTask = (id, task) => API.put(`/tasks/${id}`, task);
 export const deleteTask = (id) => API.delete(`/tasks/${id}`);
 
-// ===== WORKGROUP & WORKSPACE APIS ===== ✅
-export const getWorkgroups = () => API.get("/workgroups");
-export const createWorkgroup = (data) => API.post("/workgroups", data);
-
-// Fetch single workgroup by ID
-export const getWorkgroupById = (id) => API.get(`/workgroups/${id}`);
-
-// Create workspace inside a workgroup
-export const createWorkspace = (id, data) =>
-  API.post(`/workgroups/${id}/workspaces`, data);
-
-// ---- Project Task APIs ----
+// ===== PROJECT TASK APIS =====
 export const getProjectTasks = (workspaceId, status) =>
   API.get(`/project-tasks/${workspaceId}`, { params: { status } });
-
 export const createProjectTask = (taskData) => API.post("/project-tasks", taskData);
-
 export const updateProjectTask = (id, updatedData) =>
   API.put(`/project-tasks/${id}`, updatedData);
-
 export const deleteProjectTask = (id) => API.delete(`/project-tasks/${id}`);
 
-// ===== 📊 DASHBOARD API ===== ✅ (NEW)
+// ===== DASHBOARD API =====
 export const getDashboardStats = () => API.get("/dashboard/stats");
+

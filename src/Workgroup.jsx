@@ -5,12 +5,14 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "./Workgroup.css";
 
+// ---------------- Create Workgroup Modal ----------------
 const CreateWorkgroup = ({ isOpen, setIsOpen, onCreate }) => {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [members, setMembers] = useState([]);
   const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen) fetchMembers();
@@ -19,16 +21,16 @@ const CreateWorkgroup = ({ isOpen, setIsOpen, onCreate }) => {
   const fetchMembers = async () => {
     try {
       const res = await getMembers();
-      setMembers(res.data?.users || res.data || []);
+      setMembers(res.data || []);
     } catch (err) {
-      console.error("❌ Error fetching members:", err.response?.data || err.message);
-      setMembers([]); // prevent crash
+      console.error("❌ Error fetching members:", err);
+      setMembers([]);
     }
   };
 
   const toggleMember = (id) => {
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
+    setSelected(prev =>
+      prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
     );
   };
 
@@ -37,15 +39,20 @@ const CreateWorkgroup = ({ isOpen, setIsOpen, onCreate }) => {
 
     setLoading(true);
     try {
+      // Send selected members as _id array
       const res = await createWorkgroup({
         name,
         description: desc,
-        members: selected,
+        members: selected, // ✅ ensure this is array of _id
       });
+
       if (res.data) onCreate(res.data);
+
+      // Reset form
       setName("");
       setDesc("");
       setSelected([]);
+      setDropdownOpen(false);
       setIsOpen(false);
     } catch (err) {
       console.error("❌ Error creating workgroup:", err.response?.data || err.message);
@@ -58,28 +65,60 @@ const CreateWorkgroup = ({ isOpen, setIsOpen, onCreate }) => {
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div className="modal" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <motion.div className="modal-content" initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}>
+        <motion.div
+          className="modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div
+            className="modal-content"
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.9 }}
+          >
             <h2>Create Workgroup</h2>
-            <input placeholder="Workgroup Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <textarea placeholder="Description" value={desc} onChange={(e) => setDesc(e.target.value)} />
+            <input
+              placeholder="Workgroup Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+            <textarea
+              placeholder="Description"
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+            />
 
+            {/* ===== Member Dropdown ===== */}
             <div className="member-select">
               <h4>Select Members</h4>
-              <div className="member-list">
-                {members.length > 0 ? (
-                  members.map((m) => (
-                    <label key={m._id}>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(m._id)}
-                        onChange={() => toggleMember(m._id)}
-                      />
-                      {m.name}
-                    </label>
-                  ))
-                ) : (
-                  <p>No members found.</p>
+              <div className="dropdown-container">
+                <div
+                  className="dropdown-header"
+                  onClick={() => setDropdownOpen(prev => !prev)}
+                >
+                  {selected.length === 0
+                    ? "Select members..."
+                    : members
+                        .filter(m => selected.includes(m._id))
+                        .map(m => m.name)
+                        .join(", ")}
+                  <span className="arrow">{dropdownOpen ? "▲" : "▼"}</span>
+                </div>
+
+                {dropdownOpen && (
+                  <div className="dropdown-list">
+                    {members.map(m => (
+                      <div
+                        key={m._id}
+                        className={`dropdown-item ${selected.includes(m._id) ? "selected" : ""}`}
+                        onClick={() => toggleMember(m._id)}
+                      >
+                        {m.name} ({m.email})
+                        {selected.includes(m._id) && <span className="check">✔</span>}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>
@@ -97,22 +136,27 @@ const CreateWorkgroup = ({ isOpen, setIsOpen, onCreate }) => {
   );
 };
 
+// ---------------- Workgroup Card ----------------
 const WorkgroupCard = ({ workgroup }) => {
   const navigate = useNavigate();
   return (
     <motion.div
       className="workgroup-card"
       whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.98 }}
       onClick={() => navigate(`/workgroup/${workgroup._id}/workspaces`)}
     >
       <h3>{workgroup.name}</h3>
       <p>{workgroup.description || "No description"}</p>
-      <p><Users size={16} /> Members: {workgroup.members?.length || 0}</p>
-      <p>Workspaces: {workgroup.workspaces?.length || 0}</p>
+      <div className="card-stats">
+        <span><Users size={16} /> {workgroup.members?.length || 0} Members</span>
+        <span>{workgroup.workspaces?.length || 0} Workspaces</span>
+      </div>
     </motion.div>
   );
 };
 
+// ---------------- Main Workgroups Component ----------------
 const Workgroups = () => {
   const [workgroups, setWorkgroups] = useState([]);
   const [isCreating, setIsCreating] = useState(false);
@@ -123,6 +167,7 @@ const Workgroups = () => {
   }, []);
 
   const fetchWorkgroups = async () => {
+    setLoading(true);
     try {
       const res = await getWorkgroups();
       setWorkgroups(res.data || []);
@@ -133,7 +178,7 @@ const Workgroups = () => {
     }
   };
 
-  const handleCreate = (wg) => setWorkgroups((prev) => [...prev, wg]);
+  const handleCreate = (wg) => setWorkgroups(prev => [...prev, wg]);
 
   return (
     <div className="workgroup-container">
@@ -156,7 +201,11 @@ const Workgroups = () => {
         </motion.div>
       )}
 
-      <CreateWorkgroup isOpen={isCreating} setIsOpen={setIsCreating} onCreate={handleCreate} />
+      <CreateWorkgroup
+        isOpen={isCreating}
+        setIsOpen={setIsCreating}
+        onCreate={handleCreate}
+      />
     </div>
   );
 };

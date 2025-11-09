@@ -2,116 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { getWorkgroupById, createWorkspace } from "./api";
+import { PlusCircle, Users } from "lucide-react";
 import "./Workspace.css";
 
-const WorkspacePage = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [workgroup, setWorkgroup] = useState(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [members, setMembers] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchWorkgroup();
-  }, []);
-
-  const fetchWorkgroup = async () => {
-    try {
-      const res = await getWorkgroupById(id);
-      setWorkgroup(res.data);
-      setMembers(res.data.members || []);
-    } catch (err) {
-      console.error("Error fetching workgroup:", err.response?.data || err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCreateWorkspace = async (workspace) => {
-    try {
-      const res = await createWorkspace(id, workspace);
-      setWorkgroup((prev) => ({
-        ...prev,
-        workspaces: [...(prev.workspaces || []), res.data],
-      }));
-    } catch (err) {
-      console.error("Error creating workspace:", err.response?.data || err.message);
-    }
-  };
-
-  const handleWorkspaceClick = (workspaceId) => {
-    navigate(`/projecttask/${workspaceId}`);
-  };
-
-  if (loading) return <div className="loader">Loading...</div>;
-
-  return (
-    <div className="workspace-page">
-      <div className="workspace-header">
-        <h2>{workgroup?.name} – Workspaces</h2>
-        <motion.button
-          className="create-btn"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => setIsCreating(true)}
-        >
-          + Create Workspace
-        </motion.button>
-      </div>
-
-      <motion.div
-        className="workspace-grid"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
-        {workgroup?.workspaces?.length > 0 ? (
-          workgroup.workspaces.map((ws) => (
-            <motion.div
-              key={ws._id}
-              className="workspace-card"
-              whileHover={{ y: -5, scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              onClick={() => handleWorkspaceClick(ws._id)}
-            >
-              <h3>{ws.name}</h3>
-              <p className="desc">{ws.description || "No description provided."}</p>
-              <div className="members-list">
-                <h4>Members</h4>
-                <div className="avatar-group">
-                  {ws.members?.length > 0 ? (
-                    ws.members.map((m) => (
-                      <div key={m._id} className="avatar">
-                        {m.name?.charAt(0).toUpperCase()}
-                      </div>
-                    ))
-                  ) : (
-                    <p className="no-members">No members assigned</p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))
-        ) : (
-          <p className="no-workspaces">No workspaces found.</p>
-        )}
-      </motion.div>
-
-      <CreateWorkspaceModal
-        isOpen={isCreating}
-        setIsOpen={setIsCreating}
-        members={members}
-        onCreate={handleCreateWorkspace}
-      />
-    </div>
-  );
-};
-
-const CreateWorkspaceModal = ({ isOpen, setIsOpen, members, onCreate }) => {
+// ---------------- Create Workspace Modal ----------------
+const CreateWorkspace = ({ isOpen, setIsOpen, members, onCreate }) => {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [selected, setSelected] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const toggleMember = (id) => {
     setSelected((prev) =>
@@ -119,27 +18,40 @@ const CreateWorkspaceModal = ({ isOpen, setIsOpen, members, onCreate }) => {
     );
   };
 
-  const handleSubmit = () => {
+  const handleCreate = async () => {
     if (!name.trim()) return alert("Workspace name is required");
-    onCreate({ name, description: desc, members: selected });
-    setIsOpen(false);
-    setName("");
-    setDesc("");
-    setSelected([]);
+    setLoading(true);
+    try {
+      await onCreate({ name, description: desc, members: selected });
+      setName("");
+      setDesc("");
+      setSelected([]);
+      setIsOpen(false);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create workspace");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.div
+          className="modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
           <motion.div
             className="modal-content"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            exit={{ scale: 0.9 }}
           >
             <h2>Create Workspace</h2>
             <input
-              type="text"
               placeholder="Workspace Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -149,31 +61,114 @@ const CreateWorkspaceModal = ({ isOpen, setIsOpen, members, onCreate }) => {
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />
-            <div className="member-selection">
+            <div className="member-select">
               <h4>Select Members</h4>
               <div className="member-list">
-                {members.map((m) => (
-                  <label key={m._id} className="member-option">
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(m._id)}
-                      onChange={() => toggleMember(m._id)}
-                    />
-                    {m.name}
-                  </label>
-                ))}
+                {members.length > 0 ? (
+                  members.map((m) => (
+                    <label key={m._id}>
+                      <input
+                        type="checkbox"
+                        checked={selected.includes(m._id)}
+                        onChange={() => toggleMember(m._id)}
+                      />
+                      {m.name}
+                    </label>
+                  ))
+                ) : (
+                  <p>No members found.</p>
+                )}
               </div>
             </div>
-            <div className="modal-actions">
-              <button onClick={handleSubmit}>Create</button>
-              <button className="cancel-btn" onClick={() => setIsOpen(false)}>
-                Cancel
+            <div className="modal-buttons">
+              <button onClick={handleCreate}>
+                {loading ? "Creating..." : "Create"}
               </button>
+              <button onClick={() => setIsOpen(false)}>Cancel</button>
             </div>
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
+  );
+};
+
+// ---------------- Workspace Card ----------------
+const WorkspaceCard = ({ workspace, navigate }) => (
+  <motion.div
+    className="workgroup-card"
+    whileHover={{ scale: 1.03 }}
+    onClick={() => navigate(`/projecttask/${workspace._id}`)}
+  >
+    <h3>{workspace.name}</h3>
+    <p>{workspace.description || "No description"}</p>
+    <p>
+      <Users size={16} /> Members: {workspace.members?.length || 0}
+    </p>
+  </motion.div>
+);
+
+// ---------------- Main Workspace Page ----------------
+const WorkspacePage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [workgroup, setWorkgroup] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
+
+  useEffect(() => {
+    fetchWorkgroup();
+  }, []);
+
+  const fetchWorkgroup = async () => {
+    setLoading(true);
+    try {
+      const res = await getWorkgroupById(id);
+      setWorkgroup(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateWorkspace = async (workspace) => {
+    try {
+      const res = await createWorkspace(id, workspace);
+      setWorkgroup(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <div className="workgroup-container">
+      <div className="header">
+        <h2>{workgroup?.name} – Workspaces</h2>
+        <button onClick={() => setIsCreating(true)}>
+          <PlusCircle size={18} /> Create Workspace
+        </button>
+      </div>
+
+      {loading ? (
+        <p>Loading workspaces...</p>
+      ) : workgroup?.workspaces?.length > 0 ? (
+        <motion.div layout className="workgroup-grid">
+          {workgroup.workspaces.map((ws) => (
+            <WorkspaceCard key={ws._id} workspace={ws} navigate={navigate} />
+          ))}
+        </motion.div>
+      ) : (
+        <p>No workspaces found.</p>
+      )}
+
+      <CreateWorkspace
+        isOpen={isCreating}
+        setIsOpen={setIsCreating}
+        members={workgroup?.members || []}
+        onCreate={handleCreateWorkspace}
+      />
+    </div>
   );
 };
 

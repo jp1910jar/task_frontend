@@ -1,7 +1,15 @@
+// src/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { getDashboardStats } from "./api"; 
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { getDashboardStats } from "./api";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -19,7 +27,17 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  if (!stats) return <div className="loader">Loading Dashboard...</div>;
+  if (!stats)
+    return (
+      <motion.div
+        className="loader"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, repeat: Infinity, repeatType: "mirror" }}
+      >
+        Loading Dashboard...
+      </motion.div>
+    );
 
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
@@ -38,8 +56,10 @@ const Dashboard = () => {
           <motion.div
             key={i}
             className="card"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring" }}
+            whileHover={{ scale: 1.05, boxShadow: "0 10px 20px rgba(0,0,0,0.15)" }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1, type: "spring", stiffness: 100 }}
           >
             <h3>{item.label}</h3>
             <p>{item.value}</p>
@@ -49,6 +69,7 @@ const Dashboard = () => {
 
       {/* Charts */}
       <div className="chart-section">
+        {/* Task Status Pie */}
         <div className="chart-card">
           <h3>Task Distribution</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -57,19 +78,28 @@ const Dashboard = () => {
                 data={stats.taskStatus}
                 dataKey="count"
                 nameKey="_id"
-                label
                 outerRadius={100}
+                label={({ name, percent }) =>
+                  `${name}: ${(percent * 100).toFixed(0)}%`
+                }
+                paddingAngle={3}
               >
                 {stats.taskStatus.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip
+                formatter={(value) => [`${value}`, "Tasks"]}
+              />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
+        {/* Project Task Progress Pie */}
         <div className="chart-card">
           <h3>Project Task Progress</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -78,14 +108,22 @@ const Dashboard = () => {
                 data={stats.projectTaskStatus}
                 dataKey="count"
                 nameKey="_id"
-                label
                 outerRadius={100}
+                label={({ name, percent }) =>
+                  `${name}: ${(percent * 100).toFixed(0)}%`
+                }
+                paddingAngle={3}
               >
                 {stats.projectTaskStatus.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip
+                formatter={(value) => [`${value}`, "Project Tasks"]}
+              />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
