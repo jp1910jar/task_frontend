@@ -9,8 +9,8 @@ import "./Workgroup.css";
 const CreateWorkgroup = ({ isOpen, setIsOpen, onCreate }) => {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
-  const [members, setMembers] = useState([]);
-  const [selected, setSelected] = useState([]);
+  const [members, setMembers] = useState([]); // all available members added
+  const [selected, setSelected] = useState([]); // only selected members
   const [loading, setLoading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -28,12 +28,14 @@ const CreateWorkgroup = ({ isOpen, setIsOpen, onCreate }) => {
     }
   };
 
+  // Toggle selected member
   const toggleMember = (id) => {
     setSelected(prev =>
       prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
     );
   };
 
+  // Create workgroup
   const handleCreate = async () => {
     if (!name.trim()) return alert("Workgroup name is required");
 
@@ -43,7 +45,7 @@ const CreateWorkgroup = ({ isOpen, setIsOpen, onCreate }) => {
       const res = await createWorkgroup({
         name,
         description: desc,
-        members: selected, // ✅ ensure this is array of _id
+        members: selected,
       });
 
       if (res.data) onCreate(res.data);
@@ -99,9 +101,11 @@ const CreateWorkgroup = ({ isOpen, setIsOpen, onCreate }) => {
                 >
                   {selected.length === 0
                     ? "Select members..."
-                    : members
-                        .filter(m => selected.includes(m._id))
-                        .map(m => m.name)
+                    : selected
+                        .map(id => {
+                          const member = members.find(m => m._id === id);
+                          return member ? member.name : "Unknown";
+                        })
                         .join(", ")}
                   <span className="arrow">{dropdownOpen ? "▲" : "▼"}</span>
                 </div>
