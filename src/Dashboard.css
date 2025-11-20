@@ -1,62 +1,138 @@
+/* General Dashboard Container */
 .dashboard {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.title {
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 2rem;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9fafd;
+  min-height: 100vh;
   color: #333;
 }
 
+/* Title */
+.dashboard .title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+}
+
+/* Summary Cards Grid */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 20px;
-  margin-bottom: 40px;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .card {
   background: #fff;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 1rem;
+  padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 .card h3 {
-  font-size: 1.2rem;
-  color: #555;
-  margin-bottom: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #4b5563;
 }
 
 .card p {
   font-size: 1.5rem;
-  font-weight: bold;
-  color: #222;
+  font-weight: 600;
+  color: #111827;
 }
 
+/* Chart Section */
 .chart-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 2rem;
 }
 
 .chart-card {
+  flex: 1 1 400px;
   background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+.chart-card h3 {
+  margin-bottom: 1rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+/* Member Table */
+.user-hours-table {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.user-hours-table h3 {
+  margin-bottom: 1rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.user-hours-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.user-hours-table th,
+.user-hours-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.user-hours-table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.user-hours-table tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background 0.3s;
+}
+
+.user-hours-table tr:hover {
+  background-color: #f9fafb;
+}
+
+.user-hours-table td {
+  color: #4b5563;
+}
+
+/* Loader */
 .loader {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 500;
   text-align: center;
-  margin-top: 50px;
-  color: #555;
+  padding: 5rem;
+  color: #4b5563;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chart-section {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
 }

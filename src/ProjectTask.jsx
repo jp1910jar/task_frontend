@@ -28,6 +28,7 @@ const ProjectTask = ({ selectedWorkspace }) => {
     startDate: "",
     endDate: "",
     estimate: "",
+    actualHours: "", // new field
   });
 
   useEffect(() => {
@@ -108,6 +109,7 @@ const ProjectTask = ({ selectedWorkspace }) => {
       startDate: "",
       endDate: "",
       estimate: "",
+      actualHours: "", // reset
     });
   };
 
@@ -121,6 +123,7 @@ const ProjectTask = ({ selectedWorkspace }) => {
       startDate: task.startDate ? task.startDate.slice(0, 10) : "",
       endDate: task.endDate ? task.endDate.slice(0, 10) : "",
       estimate: task.estimate || "",
+      actualHours: task.actualHours || "", // populate field
     });
     setShowModal(true);
   };
@@ -182,17 +185,22 @@ const ProjectTask = ({ selectedWorkspace }) => {
             <th>Start</th>
             <th>End</th>
             <th>Estimate</th>
+            <th>Actual Hours</th> {/* new column */}
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {loading ? (
             <tr>
-              <td colSpan="9" className="no-task">Loading...</td>
+              <td colSpan="10" className="no-task">
+                Loading...
+              </td>
             </tr>
           ) : tasks.length === 0 ? (
             <tr>
-              <td colSpan="9" className="no-task">No project tasks yet</td>
+              <td colSpan="10" className="no-task">
+                No project tasks yet
+              </td>
             </tr>
           ) : (
             tasks.map((t) => (
@@ -200,7 +208,9 @@ const ProjectTask = ({ selectedWorkspace }) => {
                 <td>{t.projectId}</td>
                 <td>{t.taskName}</td>
                 <td>
-                  <span className={`priority-badge ${String(t.priority || "medium").toLowerCase()}`}>
+                  <span
+                    className={`priority-badge ${String(t.priority || "medium").toLowerCase()}`}
+                  >
                     {t.priority}
                   </span>
                 </td>
@@ -217,9 +227,14 @@ const ProjectTask = ({ selectedWorkspace }) => {
                 <td>{t.startDate?.slice(0, 10)}</td>
                 <td>{t.endDate?.slice(0, 10)}</td>
                 <td>{t.estimate || "-"}</td>
+                <td>{t.actualHours || "-"}</td> {/* display actual hours */}
                 <td>
-                  <button className="edit-btn" onClick={() => handleEdit(t)}>✏️</button>
-                  <button className="delete-btn" onClick={() => handleDelete(t._id)}>🗑️</button>
+                  <button className="edit-btn" onClick={() => handleEdit(t)}>
+                    ✏️
+                  </button>
+                  <button className="delete-btn" onClick={() => handleDelete(t._id)}>
+                    🗑️
+                  </button>
                 </td>
               </tr>
             ))
@@ -288,6 +303,13 @@ const ProjectTask = ({ selectedWorkspace }) => {
                 placeholder="Estimate (e.g. 5 hours)"
                 value={formData.estimate}
                 onChange={(e) => setFormData({ ...formData, estimate: e.target.value })}
+              />
+
+              <input
+                type="text"
+                placeholder="Actual Hours"
+                value={formData.actualHours}
+                onChange={(e) => setFormData({ ...formData, actualHours: e.target.value })}
               />
 
               <div className="modal-actions">
