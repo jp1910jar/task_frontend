@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-  PieChart,
-  Pie,
-  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
   Tooltip,
-  Legend,
+  CartesianGrid,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import { getDashboardStats } from "./api";
 import "./Dashboard.css";
 
@@ -19,7 +23,6 @@ const Dashboard = () => {
       try {
         const { data } = await getDashboardStats();
         setStats(data);
-        console.log("Dashboard stats:", data);
       } catch (err) {
         console.error("Error fetching dashboard:", err);
       }
@@ -27,23 +30,33 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  if (!stats)
-    return (
-      <motion.div
-        className="loader"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, repeat: Infinity, repeatType: "mirror" }}
-      >
-        Loading Dashboard...
-      </motion.div>
-    );
+  // 🚀 Function to Export to Excel
+  const exportToExcel = () => {
+    const excelData = stats.members.map((m, index) => ({
+      "Sr No.": index + 1,
+      Name: m.name,
+      Designation: m.designation || m.role || "-",
+      "Total Hours": `${Math.floor(m.totalActualHours / 60)}h ${
+        m.totalActualHours % 60
+      }m`,
+    }));
 
-  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Task Report");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const fileData = new Blob([excelBuffer], { type: "application/octet-stream" });
+
+    saveAs(fileData, `Task_Report_${new Date().toLocaleDateString()}.xlsx`);
+  };
+
+  if (!stats)
+    return <div className="loader">Loading Dashboard...</div>;
 
   return (
-    <div className="dashboard">
-      <h2 className="title">📊 Project Management Dashboard</h2>
+    <motion.div className="dashboard" initial={{ opacity: 1 }} animate={{ opacity: 1 }}>
+      <h2 className="title">📊 Dashboard Summary</h2>
 
       {/* Summary Cards */}
       <div className="card-grid">
@@ -56,13 +69,8 @@ const Dashboard = () => {
           <motion.div
             key={i}
             className="card"
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0px 10px 20px rgba(0,0,0,0.15)",
-            }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1, type: "spring", stiffness: 100 }}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 140 }}
           >
             <h3>{item.label}</h3>
             <p>{item.value}</p>
@@ -70,60 +78,15 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Charts */}
-      <div className="chart-section">
-        <div className="chart-card">
-          <h3>Task Distribution</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={stats.taskStatus}
-                dataKey="count"
-                nameKey="_id"
-                outerRadius={100}
-                label={({ name, percent }) =>
-                  `${name}: ${(percent * 100).toFixed(0)}%`
-                }
-                paddingAngle={3}
-              >
-                {stats.taskStatus.map((entry, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => [`${value}`, "Tasks"]} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="chart-card">
-          <h3>Project Task Progress</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={stats.projectTaskStatus}
-                dataKey="count"
-                nameKey="_id"
-                outerRadius={100}
-                label={({ name, percent }) =>
-                  `${name}: ${(percent * 100).toFixed(0)}%`
-                }
-                paddingAngle={3}
-              >
-                {stats.projectTaskStatus.map((entry, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => [`${value}`, "Project Tasks"]} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Member Hours Table */}
+      {/* Export Button + Member Table */}
       <div className="user-hours-table">
-        <h3>👥 Member Work Hours</h3>
+        <div className="table-header">
+          <h3>👥 Member Work Hours</h3>
+          <button className="export-btn" onClick={exportToExcel}>
+            📁 Export Excel
+          </button>
+        </div>
+
         <table>
           <thead>
             <tr>
@@ -133,28 +96,51 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {stats.members.length > 0 ? (
-              stats.members.map((member) => (
-                <tr key={member.memberId}>
-                  <td>{member.name}</td>
-                  <td>{member.designation || member.role || "-"}</td>
-                  <td>
-                    {Math.floor(member.totalActualHours / 60)}h{" "}
-                    {member.totalActualHours % 60}m
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={3} style={{ textAlign: "center" }}>
-                  No members found
+            {stats.members.map((member) => (
+              <tr key={member.memberId}>
+                <td>{member.name}</td>
+                <td>{member.designation || member.role || "-"}</td>
+                <td>
+                  {Math.floor(member.totalActualHours / 60)}h{" "}
+                  {member.totalActualHours % 60}m
                 </td>
               </tr>
-            )}
+            ))}
           </tbody>
         </table>
       </div>
-    </div>
+
+      {/* Charts */}
+      <div className="chart-section">
+        <div className="chart-card">
+          <h3>📌 Task Status</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={stats.taskStatus}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="_id" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="count" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="chart-card">
+          <h3>📁 Project Task Progress</h3>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={stats.projectTaskStatus}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="_id" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="count" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 

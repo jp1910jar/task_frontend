@@ -80,15 +80,14 @@ const Members = () => {
   };
 
   const filteredMembers = members.filter((m) =>
-    [m.name, m.email, m.role].some(
-      (v) => v && v.toLowerCase().includes(search.toLowerCase())
-    )
+    [m.name, m.email, m.role].some((v) => v && v.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
     <div className="members-container">
       <div className="members-header">
         <h1>Workspace Members</h1>
+
         <div className="header-actions">
           <input
             type="text"
@@ -103,25 +102,44 @@ const Members = () => {
         </div>
       </div>
 
-      <div className="list-view">
-        {filteredMembers.map((m) => (
-          <div key={m._id} className="member-card">
-            <div className="avatar">{m.name?.charAt(0).toUpperCase()}</div>
-            <div className="member-details">
-              <p className="member-name">{m.name}</p>
-              <p className="member-email">{m.email}</p>
-              <p className="member-phone">{m.phone}</p>
-              <p className="member-designation">{m.designation}</p>
-              <span className={`role-badge ${m.role === "admin" ? "role-admin" : "role-member"}`}>
-                {m.role}
-              </span>
-            </div>
-            <div className="member-actions">
-              <button className="edit-btn" onClick={() => handleEdit(m)}>✏️</button>
-              <button className="delete-btn" onClick={() => handleDelete(m._id)}>🗑️</button>
-            </div>
-          </div>
-        ))}
+      {/* Table View */}
+      <div className="table-wrapper">
+        <table className="member-table">
+          <thead>
+            <tr>
+              <th>Avatar</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Designation</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {filteredMembers.map((m) => (
+              <tr key={m._id}>
+                <td>
+                  <div className="avatar-table">{m.name?.charAt(0).toUpperCase()}</div>
+                </td>
+                <td>{m.name}</td>
+                <td>{m.email}</td>
+                <td>{m.phone || "-"}</td>
+                <td>{m.designation || "-"}</td>
+                <td>
+                  <span className={`role-badge ${m.role === "admin" ? "role-admin" : "role-member"}`}>
+                    {m.role}
+                  </span>
+                </td>
+                <td>
+                  <button className="edit-btn" onClick={() => handleEdit(m)}>✏️</button>
+                  <button className="delete-btn" onClick={() => handleDelete(m._id)}>🗑️</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {showPopup && (
@@ -164,7 +182,13 @@ const Members = () => {
               </select>
               <div className="form-actions">
                 <button type="submit">{editingMember ? "Update" : "Add"}</button>
-                <button type="button" onClick={() => { setShowPopup(false); setEditingMember(null); }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPopup(false);
+                    setEditingMember(null);
+                  }}
+                >
                   Cancel
                 </button>
               </div>
@@ -177,3 +201,4 @@ const Members = () => {
 };
 
 export default Members;
+

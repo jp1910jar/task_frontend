@@ -5,12 +5,13 @@ import { getWorkgroupById, createWorkspace } from "./api";
 import { PlusCircle, Users } from "lucide-react";
 import "./Workspace.css";
 
-// ---------------- Create Workspace Modal ----------------
+/* ---------------- Create Workspace Modal ---------------- */
 const CreateWorkspace = ({ isOpen, setIsOpen, members, onCreate }) => {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showMembers, setShowMembers] = useState(false);
 
   const toggleMember = (id) => {
     setSelected((prev) =>
@@ -45,41 +46,65 @@ const CreateWorkspace = ({ isOpen, setIsOpen, members, onCreate }) => {
           exit={{ opacity: 0 }}
         >
           <motion.div
-            className="modal-content"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0.9 }}
+            className="modal-content beautiful-modal"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
           >
             <h2>Create Workspace</h2>
+
             <input
               placeholder="Workspace Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
+
             <textarea
-              placeholder="Description"
+              placeholder="Description (optional)"
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
             />
-            <div className="member-select">
-              <h4>Select Members</h4>
-              <div className="member-list">
-                {members.length > 0 ? (
-                  members.map((m) => (
-                    <label key={m._id}>
-                      <input
-                        type="checkbox"
-                        checked={selected.includes(m._id)}
-                        onChange={() => toggleMember(m._id)}
-                      />
-                      {m.name}
-                    </label>
-                  ))
-                ) : (
-                  <p>No members found.</p>
-                )}
+
+            {/* MEMBERS DROPDOWN */}
+            <div className="dropdown-container">
+              <div
+                className="dropdown-header"
+                onClick={() => setShowMembers(!showMembers)}
+              >
+                <span>
+                  {selected.length > 0
+                    ? `${selected.length} Members Selected`
+                    : "Select Members"}
+                </span>
+                <span className="arrow">{showMembers ? "▲" : "▼"}</span>
               </div>
+
+              {showMembers && (
+                <div className="dropdown-list">
+                  {members.length > 0 ? (
+                    members.map((m) => (
+                      <div
+                        key={m._id}
+                        className={`dropdown-item ${
+                          selected.includes(m._id) ? "selected" : ""
+                        }`}
+                        onClick={() => toggleMember(m._id)}
+                      >
+                        <span>{m.name}</span>
+
+                        {selected.includes(m._id) && (
+                          <span className="check">✔</span>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="no-members-text">No members found.</p>
+                  )}
+                </div>
+              )}
             </div>
+
+            {/* BUTTONS */}
             <div className="modal-buttons">
               <button onClick={handleCreate}>
                 {loading ? "Creating..." : "Create"}
@@ -93,22 +118,24 @@ const CreateWorkspace = ({ isOpen, setIsOpen, members, onCreate }) => {
   );
 };
 
-// ---------------- Workspace Card ----------------
+/* ---------------- Workspace Card ---------------- */
 const WorkspaceCard = ({ workspace, navigate }) => (
   <motion.div
     className="workgroup-card"
-    whileHover={{ scale: 1.03 }}
+    whileHover={{ scale: 1.05 }}
     onClick={() => navigate(`/projecttask/${workspace._id}`)}
   >
     <h3>{workspace.name}</h3>
     <p>{workspace.description || "No description"}</p>
-    <p>
-      <Users size={16} /> Members: {workspace.members?.length || 0}
-    </p>
+
+    <div className="card-footer">
+      <Users size={18} />
+      <span>{workspace.members?.length || 0} Members</span>
+    </div>
   </motion.div>
 );
 
-// ---------------- Main Workspace Page ----------------
+/* ---------------- Main Workspace Page ---------------- */
 const WorkspacePage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
